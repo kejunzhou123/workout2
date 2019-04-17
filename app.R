@@ -1,13 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-#library(rsconnect)
-#rsconnect::deployApp('/Users/a123/Desktop/computing with data/workout02/workout2')
 future_value<-function(amount,rate,years){
   amount_after=amount*(1+rate)^years
   return (amount_after)
@@ -22,6 +12,7 @@ growing_annuity<-function(contrib,rate,growth,years){
 }
 
 library(ggplot2)
+library(shiny)
 # Define UI for slider demo application
 ui=fluidPage(
   #  Application title
@@ -45,17 +36,17 @@ ui=fluidPage(
                        min=0, max=50,value=10,step=1,sep=",",animate = TRUE
            ),
            selectInput('facet', 'Facet?', c("No", "Yes")))
-    ),
-    #conditionalPanel("input.facet=No",plotOutput("scatterPlot",height=300)),
-    #   # Show a table summarizing the values entered
-    hr(),
-    h4('Timelines'),
-    plotOutput(outputId = "scatterplot",width=1000),
-    hr(),
-    h4('Balances'),
-    tableOutput(outputId = "future_value")
-    
-  )
+  ),
+  #conditionalPanel("input.facet=No",plotOutput("scatterPlot",height=300)),
+  #   # Show a table summarizing the values entered
+  hr(),
+  h4('Timelines'),
+  plotOutput(outputId = "scatterplot",width=1000),
+  hr(),
+  h4('Balances'),
+  #tableOutput(outputId = "future_value")
+  verbatimTextOutput('future_value')
+)
 
 
 # Define server logic for slider examples
@@ -79,8 +70,8 @@ server=function(input, output) {
     growing_contrib=as.data.frame(growing_contrib)
     year=matrix(seq(0,input$year),input$year+1,1)
     modality=cbind(year,no_contrib,fixed_contrib,growing_contrib)
+    modality=as.data.frame(modality)
     modality
-    
   })
   
   modality2=reactive({
@@ -123,12 +114,11 @@ server=function(input, output) {
   })
   
   
-  output$future_value=renderTable({
+  output$future_value=renderPrint({
     modality()
     
   })
 }
-
 
 
 #
